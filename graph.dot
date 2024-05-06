@@ -1,0 +1,121 @@
+digraph {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] aws_alb.main (expand)" [label = "aws_alb.main", shape = "box"]
+		"[root] aws_alb_listener.front_end (expand)" [label = "aws_alb_listener.front_end", shape = "box"]
+		"[root] aws_alb_target_group.app (expand)" [label = "aws_alb_target_group.app", shape = "box"]
+		"[root] aws_appautoscaling_policy.down (expand)" [label = "aws_appautoscaling_policy.down", shape = "box"]
+		"[root] aws_appautoscaling_policy.up (expand)" [label = "aws_appautoscaling_policy.up", shape = "box"]
+		"[root] aws_appautoscaling_target.target (expand)" [label = "aws_appautoscaling_target.target", shape = "box"]
+		"[root] aws_cloudwatch_log_group.cb_log_group (expand)" [label = "aws_cloudwatch_log_group.cb_log_group", shape = "box"]
+		"[root] aws_cloudwatch_log_stream.cb_log_stream (expand)" [label = "aws_cloudwatch_log_stream.cb_log_stream", shape = "box"]
+		"[root] aws_cloudwatch_metric_alarm.service_cpu_high (expand)" [label = "aws_cloudwatch_metric_alarm.service_cpu_high", shape = "box"]
+		"[root] aws_cloudwatch_metric_alarm.service_cpu_low (expand)" [label = "aws_cloudwatch_metric_alarm.service_cpu_low", shape = "box"]
+		"[root] aws_ecs_cluster.main (expand)" [label = "aws_ecs_cluster.main", shape = "box"]
+		"[root] aws_ecs_service.main (expand)" [label = "aws_ecs_service.main", shape = "box"]
+		"[root] aws_ecs_task_definition.app (expand)" [label = "aws_ecs_task_definition.app", shape = "box"]
+		"[root] aws_eip.gw (expand)" [label = "aws_eip.gw", shape = "box"]
+		"[root] aws_iam_role.ecs_auto_scale_role (expand)" [label = "aws_iam_role.ecs_auto_scale_role", shape = "box"]
+		"[root] aws_iam_role.ecs_task_execution_role (expand)" [label = "aws_iam_role.ecs_task_execution_role", shape = "box"]
+		"[root] aws_iam_role.ecs_task_role (expand)" [label = "aws_iam_role.ecs_task_role", shape = "box"]
+		"[root] aws_iam_role_policy_attachment.ecs-task-execution-role-policy-attachment (expand)" [label = "aws_iam_role_policy_attachment.ecs-task-execution-role-policy-attachment", shape = "box"]
+		"[root] aws_iam_role_policy_attachment.ecs_auto_scale_role (expand)" [label = "aws_iam_role_policy_attachment.ecs_auto_scale_role", shape = "box"]
+		"[root] aws_iam_role_policy_attachment.task_s3 (expand)" [label = "aws_iam_role_policy_attachment.task_s3", shape = "box"]
+		"[root] aws_internet_gateway.gw (expand)" [label = "aws_internet_gateway.gw", shape = "box"]
+		"[root] aws_nat_gateway.gw (expand)" [label = "aws_nat_gateway.gw", shape = "box"]
+		"[root] aws_route.internet_access (expand)" [label = "aws_route.internet_access", shape = "box"]
+		"[root] aws_route_table.private (expand)" [label = "aws_route_table.private", shape = "box"]
+		"[root] aws_route_table_association.private (expand)" [label = "aws_route_table_association.private", shape = "box"]
+		"[root] aws_security_group.ecs_tasks (expand)" [label = "aws_security_group.ecs_tasks", shape = "box"]
+		"[root] aws_security_group.lb (expand)" [label = "aws_security_group.lb", shape = "box"]
+		"[root] aws_subnet.private (expand)" [label = "aws_subnet.private", shape = "box"]
+		"[root] aws_subnet.public (expand)" [label = "aws_subnet.public", shape = "box"]
+		"[root] aws_vpc.main (expand)" [label = "aws_vpc.main", shape = "box"]
+		"[root] data.aws_availability_zones.available (expand)" [label = "data.aws_availability_zones.available", shape = "box"]
+		"[root] data.aws_iam_policy_document.ecs_auto_scale_role (expand)" [label = "data.aws_iam_policy_document.ecs_auto_scale_role", shape = "box"]
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" [label = "provider[\"registry.terraform.io/hashicorp/aws\"]", shape = "diamond"]
+		"[root] var.app_count" [label = "var.app_count", shape = "note"]
+		"[root] var.app_image" [label = "var.app_image", shape = "note"]
+		"[root] var.app_port" [label = "var.app_port", shape = "note"]
+		"[root] var.aws_access_key" [label = "var.aws_access_key", shape = "note"]
+		"[root] var.aws_region" [label = "var.aws_region", shape = "note"]
+		"[root] var.aws_secret_key" [label = "var.aws_secret_key", shape = "note"]
+		"[root] var.az_count" [label = "var.az_count", shape = "note"]
+		"[root] var.ec2_task_execution_role_name" [label = "var.ec2_task_execution_role_name", shape = "note"]
+		"[root] var.ecs_auto_scale_role_name" [label = "var.ecs_auto_scale_role_name", shape = "note"]
+		"[root] var.fargate_cpu" [label = "var.fargate_cpu", shape = "note"]
+		"[root] var.fargate_memory" [label = "var.fargate_memory", shape = "note"]
+		"[root] var.health_check_path" [label = "var.health_check_path", shape = "note"]
+		"[root] aws_alb.main (expand)" -> "[root] aws_security_group.lb (expand)"
+		"[root] aws_alb.main (expand)" -> "[root] aws_subnet.public (expand)"
+		"[root] aws_alb_listener.front_end (expand)" -> "[root] aws_alb.main (expand)"
+		"[root] aws_alb_listener.front_end (expand)" -> "[root] aws_alb_target_group.app (expand)"
+		"[root] aws_alb_target_group.app (expand)" -> "[root] aws_vpc.main (expand)"
+		"[root] aws_alb_target_group.app (expand)" -> "[root] var.health_check_path"
+		"[root] aws_appautoscaling_policy.down (expand)" -> "[root] aws_appautoscaling_target.target (expand)"
+		"[root] aws_appautoscaling_policy.up (expand)" -> "[root] aws_appautoscaling_target.target (expand)"
+		"[root] aws_appautoscaling_target.target (expand)" -> "[root] aws_ecs_service.main (expand)"
+		"[root] aws_appautoscaling_target.target (expand)" -> "[root] aws_iam_role.ecs_auto_scale_role (expand)"
+		"[root] aws_cloudwatch_log_group.cb_log_group (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] aws_cloudwatch_log_stream.cb_log_stream (expand)" -> "[root] aws_cloudwatch_log_group.cb_log_group (expand)"
+		"[root] aws_cloudwatch_metric_alarm.service_cpu_high (expand)" -> "[root] aws_appautoscaling_policy.up (expand)"
+		"[root] aws_cloudwatch_metric_alarm.service_cpu_low (expand)" -> "[root] aws_appautoscaling_policy.down (expand)"
+		"[root] aws_ecs_cluster.main (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] aws_ecs_service.main (expand)" -> "[root] aws_alb_listener.front_end (expand)"
+		"[root] aws_ecs_service.main (expand)" -> "[root] aws_ecs_cluster.main (expand)"
+		"[root] aws_ecs_service.main (expand)" -> "[root] aws_ecs_task_definition.app (expand)"
+		"[root] aws_ecs_service.main (expand)" -> "[root] aws_iam_role_policy_attachment.ecs-task-execution-role-policy-attachment (expand)"
+		"[root] aws_ecs_service.main (expand)" -> "[root] aws_security_group.ecs_tasks (expand)"
+		"[root] aws_ecs_service.main (expand)" -> "[root] aws_subnet.private (expand)"
+		"[root] aws_ecs_service.main (expand)" -> "[root] var.app_count"
+		"[root] aws_ecs_task_definition.app (expand)" -> "[root] aws_iam_role.ecs_task_execution_role (expand)"
+		"[root] aws_ecs_task_definition.app (expand)" -> "[root] var.app_image"
+		"[root] aws_ecs_task_definition.app (expand)" -> "[root] var.app_port"
+		"[root] aws_ecs_task_definition.app (expand)" -> "[root] var.fargate_cpu"
+		"[root] aws_ecs_task_definition.app (expand)" -> "[root] var.fargate_memory"
+		"[root] aws_eip.gw (expand)" -> "[root] aws_internet_gateway.gw (expand)"
+		"[root] aws_eip.gw (expand)" -> "[root] var.az_count"
+		"[root] aws_iam_role.ecs_auto_scale_role (expand)" -> "[root] data.aws_iam_policy_document.ecs_auto_scale_role (expand)"
+		"[root] aws_iam_role.ecs_auto_scale_role (expand)" -> "[root] var.ecs_auto_scale_role_name"
+		"[root] aws_iam_role.ecs_task_execution_role (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] aws_iam_role.ecs_task_role (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] aws_iam_role_policy_attachment.ecs-task-execution-role-policy-attachment (expand)" -> "[root] aws_iam_role.ecs_task_execution_role (expand)"
+		"[root] aws_iam_role_policy_attachment.ecs_auto_scale_role (expand)" -> "[root] aws_iam_role.ecs_auto_scale_role (expand)"
+		"[root] aws_iam_role_policy_attachment.task_s3 (expand)" -> "[root] aws_iam_role.ecs_task_role (expand)"
+		"[root] aws_internet_gateway.gw (expand)" -> "[root] aws_vpc.main (expand)"
+		"[root] aws_nat_gateway.gw (expand)" -> "[root] aws_eip.gw (expand)"
+		"[root] aws_nat_gateway.gw (expand)" -> "[root] aws_subnet.public (expand)"
+		"[root] aws_route.internet_access (expand)" -> "[root] aws_internet_gateway.gw (expand)"
+		"[root] aws_route_table.private (expand)" -> "[root] aws_nat_gateway.gw (expand)"
+		"[root] aws_route_table_association.private (expand)" -> "[root] aws_route_table.private (expand)"
+		"[root] aws_route_table_association.private (expand)" -> "[root] aws_subnet.private (expand)"
+		"[root] aws_security_group.ecs_tasks (expand)" -> "[root] aws_security_group.lb (expand)"
+		"[root] aws_security_group.lb (expand)" -> "[root] aws_vpc.main (expand)"
+		"[root] aws_security_group.lb (expand)" -> "[root] var.app_port"
+		"[root] aws_subnet.private (expand)" -> "[root] aws_vpc.main (expand)"
+		"[root] aws_subnet.private (expand)" -> "[root] data.aws_availability_zones.available (expand)"
+		"[root] aws_subnet.private (expand)" -> "[root] var.az_count"
+		"[root] aws_subnet.public (expand)" -> "[root] aws_vpc.main (expand)"
+		"[root] aws_subnet.public (expand)" -> "[root] data.aws_availability_zones.available (expand)"
+		"[root] aws_subnet.public (expand)" -> "[root] var.az_count"
+		"[root] aws_vpc.main (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] data.aws_availability_zones.available (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] data.aws_iam_policy_document.ecs_auto_scale_role (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] output.alb_hostname (expand)" -> "[root] aws_alb.main (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_cloudwatch_log_stream.cb_log_stream (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_cloudwatch_metric_alarm.service_cpu_high (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_cloudwatch_metric_alarm.service_cpu_low (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_iam_role_policy_attachment.ecs_auto_scale_role (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_iam_role_policy_attachment.task_s3 (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_route.internet_access (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_route_table_association.private (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" -> "[root] var.aws_access_key"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" -> "[root] var.aws_region"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" -> "[root] var.aws_secret_key"
+		"[root] root" -> "[root] output.alb_hostname (expand)"
+		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)"
+		"[root] root" -> "[root] var.ec2_task_execution_role_name"
+	}
+}
+
