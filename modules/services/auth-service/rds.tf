@@ -1,7 +1,7 @@
 resource "aws_db_subnet_group" "auth_rds_subnet_group" {
   name        = "auth-rds-subnet-group"
   description = "RDS subnet group"
-  subnet_ids  = var.subnet_ids
+  subnet_ids  = var.private_subnets
 }
 
 resource "aws_db_instance" "auth_db" {

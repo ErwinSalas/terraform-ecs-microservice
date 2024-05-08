@@ -69,3 +69,7 @@ variable "fgms_dns_discovery_id" {
 variable "auth_service_url" {
   type = string
 }
+
+variable "order_service_url" {
+  type = string
+}

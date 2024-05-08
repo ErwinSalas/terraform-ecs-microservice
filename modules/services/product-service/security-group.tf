@@ -1,7 +1,7 @@
 
 # Traffic to the ECS cluster should only come from the ALB
-resource "aws_security_group" "ecs_task_auth_sg" {
-  name        = "auth-ecs-tasks-security-group"
+resource "aws_security_group" "ecs_task_product_sg" {
+  name        = "product-ecs-tasks-security-group"
   description = "allow inbound access from the ALB only"
   vpc_id      = var.vpc_id
 
@@ -9,7 +9,7 @@ resource "aws_security_group" "ecs_task_auth_sg" {
     protocol        = "tcp"
     from_port       = var.app_port
     to_port         = var.app_port
-    security_groups = [var.api_sg]
+    security_groups = [aws_security_group.lb_sg.id]
   }
 
   egress {
@@ -20,8 +20,8 @@ resource "aws_security_group" "ecs_task_auth_sg" {
   }
 }
 
-resource "aws_security_group" "rds_sg" {
-  name        = "rds-security-group"
+resource "aws_security_group" "product_rds_sg" {
+  name        = "product-rds-security-group"
   description = "Security group for RDS PostgreSQL"
   vpc_id      = var.vpc_id
 
@@ -31,7 +31,7 @@ resource "aws_security_group" "rds_sg" {
     from_port   = 5432  # Puerto PostgreSQL
     to_port     = 5432
     protocol    = "tcp"
-    security_groups = [aws_security_group.ecs_task_auth_sg.id]
+    security_groups = [aws_security_group.ecs_task_product_sg.id]
   }
   # Otras reglas de seguridad si es necesario
 }

@@ -38,5 +38,5 @@ variable "fargate_memory" {
 }
 
 variable "fargate_private_dns_namespace" {
-  default = "fargate-microservices"
+  default = "fargate-microservices.local"
 }

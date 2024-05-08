@@ -57,13 +57,6 @@ resource "aws_ecs_service" "auth_service" {
   network_configuration {
     security_groups  = [aws_security_group.ecs_task_auth_sg.id]
     subnets          = var.private_subnets
-    assign_public_ip = true
-  }
-
-  load_balancer {
-    target_group_arn = var.target_group_arn
-    container_name   = var.container_name
-    container_port   = var.app_port
   }
 
   service_registries {
@@ -72,7 +65,7 @@ resource "aws_ecs_service" "auth_service" {
 }
 
 resource "aws_service_discovery_service" "auth_discovery_service" {
-  name = "auth"
+  name = "auth-service"
 
   dns_config {
     namespace_id = var.fgms_dns_discovery_id

@@ -46,7 +46,7 @@ variable "private_subnets" {
   type = list(string)
 }
 
-variable "target_group_arn" {
+variable "api_sg" {
   type = string
 }
 
@@ -54,17 +54,10 @@ variable "container_name" {
   type = string
 }
 
-variable "alb_sg" {
-  type = string
-}
-
 variable "vpc_id" {
   type = string
 }
 
-variable "subnet_ids" {
-  type = list(string)
-}
 
 variable "fgms_dns_discovery_id" {
   type = string
