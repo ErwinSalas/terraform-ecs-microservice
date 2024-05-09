@@ -6,4 +6,4 @@
 
 # Module directory
 .terraform/
-*.tfvars
+credentials.tfvars
