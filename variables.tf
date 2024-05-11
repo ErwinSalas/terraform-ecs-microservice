@@ -81,6 +81,11 @@ variable "public_subnets" {
   description = "Public subnets"
 }
 
+variable "az_count" {
+  type        = number
+  description = "Availability zones that the services are running"
+}
+
 ########################################################################################################################
 #ALB
 

@@ -1,15 +1,17 @@
-## Application configurations
+
+
 account      = 000000
 region       = "us-east-1"
 app_name     = "ecs-demo"
 env          = "dev"
-app_services = ["api-gateway", "auth-service"]
+app_services = ["api-gateway-key", "auth-service-key"]
 
 #VPC configurations
-cidr               = "10.10.0.0/16"
+cidr               = "10.0.0.0/16"
+public_subnets     = ["10.0.0.0/24", "10.0.1.0/24"]
+private_subnets    = ["10.0.2.0/24", "10.0.3.0/24",]
 availability_zones = ["us-east-1a", "us-east-1b"]
-public_subnets     = ["10.10.50.0/24", "10.10.51.0/24"]
-private_subnets    = ["10.10.0.0/24", "10.10.1.0/24"]
+az_count = 2
 
 ########################################################################################################################
 # Map Keys

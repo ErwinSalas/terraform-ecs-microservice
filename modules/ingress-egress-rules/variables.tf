@@ -2,6 +2,10 @@ variable "security_groups_ids" {
   type = map(string)
 }
 
+variable "source_security_groups_ids" {
+  type = map(string)
+}
+
 variable "ingress_rules" {
   type = map(list(object({
     from_port   = number

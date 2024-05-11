@@ -32,7 +32,7 @@ variable "public_subnets" {
 
 variable "envs" {
   type = map(list(object({
-    name = string
+    name  = string
     value = string
   })))
 }
@@ -44,7 +44,7 @@ variable "security_groups" {
 variable "service_config" {
   type = map(object({
     name           = string
-    image           = string
+    image          = string
     is_public      = bool
     container_port = number
     host_port      = number
@@ -63,7 +63,7 @@ variable "service_config" {
     auto_scaling = object({
       max_capacity = number
       min_capacity = number
-      cpu          = object({
+      cpu = object({
         target_value = number
       })
       memory = object({

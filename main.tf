@@ -15,13 +15,14 @@ module "iam" {
 }
 
 module "vpc" {
-  source             = "./modules/vpc"
-  app_name           = var.app_name
-  env                = var.env
-  cidr               = var.cidr
+  source   = "./modules/vpc"
+  app_name = var.app_name
+  env      = var.env
+  cidr     = var.cidr
+  private_subnets = var.private_subnets
+  public_subnets = var.public_subnets
   availability_zones = var.availability_zones
-  public_subnets     = var.public_subnets
-  private_subnets    = var.private_subnets
+  az_count = var.az_count
 }
 
 module "security_groups" {
@@ -35,11 +36,19 @@ module "rules" {
   egress_rules  = local.egress_rules
   ingress_rules = local.ingress_rules
   security_groups_ids = {
+    "${var.auth_service_key}" = module.security_groups.security_group_ids[var.auth_service_key]
+    "${var.api_gateway_key}"  = module.security_groups.security_group_ids[var.api_gateway_key]
+    "${var.auth_db_key}"      = module.security_groups.security_group_ids[var.auth_db_key]
+    "${var.internal_lb_key}"  = module.security_groups.security_group_ids[var.internal_lb_key]
+    "${var.external_lb_key}"  = module.security_groups.security_group_ids[var.external_lb_key]
+  }
+
+  source_security_groups_ids = {
     "${var.auth_service_key}" = module.security_groups.security_group_ids[var.internal_lb_key]
     "${var.api_gateway_key}"  = module.security_groups.security_group_ids[var.external_lb_key]
     "${var.auth_db_key}"      = module.security_groups.security_group_ids[var.auth_service_key]
-    "${var.internal_lb_key}"  = module.security_groups.security_group_ids[var.internal_lb_key]
-    "${var.external_lb_key}"  = module.security_groups.security_group_ids[var.external_lb_key]
+    "${var.internal_lb_key}"  = module.security_groups.security_group_ids[var.api_gateway_key]
+    "${var.external_lb_key}"  = null
   }
 }
 
@@ -48,7 +57,7 @@ module "auth_database" {
   source          = "./modules/rds"
   username        = "auth_service"
   password        = "!ExSxExSx020821!"
-  private_subnets = var.private_subnets
+  private_subnets = module.vpc.private_subnets
   security_groups_ids = [
     module.security_groups.security_group_ids[var.auth_db_key],
     module.security_groups.security_group_ids[var.auth_service_key]
