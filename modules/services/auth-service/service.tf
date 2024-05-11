@@ -10,8 +10,8 @@ resource "aws_ecs_task_definition" "auth" {
     {
       name        = var.container_name
       image       = var.app_image
-      cpu         = 1024
-      memory      = 2048
+      cpu         = var.cpu
+      memory      = var.memory
       networkMode = "awsvpc"
       environment = [
         {

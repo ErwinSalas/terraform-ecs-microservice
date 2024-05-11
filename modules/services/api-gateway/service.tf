@@ -10,8 +10,8 @@ resource "aws_ecs_task_definition" "api_gateway" {
     {
       name        = var.container_name
       image       = var.app_image
-      cpu         = 1
-      memory      = 256
+      cpu         = var.cpu
+      memory      = var.memory
       networkMode = "awsvpc"
       environment = [
         {
