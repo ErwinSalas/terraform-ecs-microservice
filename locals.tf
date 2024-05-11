@@ -101,7 +101,7 @@ locals {
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
-      cidr_blocks = ["10.10.0.0/16"]
+      cidr_blocks = ["0.0.0.0/0"]
     }]
     "${var.external_lb_key}" = [{
       from_port   = 0
@@ -113,13 +113,13 @@ locals {
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
-      cidr_blocks = ["10.10.0.0/16"]
+      cidr_blocks = ["0.0.0.0/0"]
     }]
     "${var.api_gateway_key}" = [{
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
-      cidr_blocks = ["10.10.0.0/16"]
+      cidr_blocks = ["0.0.0.0/0"]
     }]
   }
 }
