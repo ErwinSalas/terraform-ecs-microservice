@@ -71,8 +71,8 @@ module "internal_alb" {
   vpc_id            = module.vpc.vpc_id
   target_groups     = local.internal_alb_target_groups
   internal          = true
-  listener_port     = 80
-  listener_protocol = "HTTP"
+  listener_port     = 443
+  listener_protocol = "TCP"
   listeners         = var.internal_alb_config.listeners
   security_groups   = [module.security_groups.security_group_ids[var.internal_lb_key]]
 }

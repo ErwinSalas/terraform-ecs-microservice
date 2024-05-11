@@ -6,7 +6,7 @@ output "internal_alb_id" {
 }
 
 output "target_groups" {
-  value = aws_alb_target_group.alb_target_group
+  value = var.internal ? aws_alb_target_group.grpc_alb_target_group : aws_alb_target_group.http_alb_target_group
 }
 
 output "aws_alb_listener" {

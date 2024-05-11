@@ -40,7 +40,7 @@ locals {
       desired_count  = 1
       alb_target_group = {
         port              = 50051
-        protocol          = "HTTP"
+        protocol          = "TCP"
         path_pattern      = ["/auth*"]
         health_check_path = "/health"
         priority          = 1
@@ -65,21 +65,21 @@ locals {
 
   ingress_rules = {
     "${var.internal_lb_key}" = [{
-      from_port   = local.microservice_config[var.api_gateway_key].host_port
-      to_port     = local.microservice_config[var.auth_service_key].host_port
+      from_port   = 443
+      to_port     = 443
       protocol    = "tcp"
       cidr_blocks = [var.cidr]
     }]
     "${var.external_lb_key}" = [{
       from_port   = 80
-      to_port     = local.microservice_config[var.api_gateway_key].host_port
+      to_port     = 80
       protocol    = "tcp"
-      cidr_blocks = [var.cidr]
+      cidr_blocks = ["0.0.0.0/0"]
     }]
     "${var.auth_service_key}" = [{
       from_port   = local.microservice_config[var.auth_service_key].host_port
       to_port     = local.microservice_config[var.auth_service_key].host_port
-      protocol    = -1
+      protocol    = "tcp"
       cidr_blocks = [var.cidr]
     }]
     "${var.auth_db_key}" = [{
@@ -89,9 +89,9 @@ locals {
       cidr_blocks = [var.cidr]
     }]
     "${var.api_gateway_key}" = [{
-      from_port   = 80
+      from_port   = local.microservice_config[var.api_gateway_key].host_port
       to_port     = local.microservice_config[var.api_gateway_key].host_port
-      protocol    = "-1"
+      protocol    = "tcp"
       cidr_blocks = [var.cidr]
     }]
   }
