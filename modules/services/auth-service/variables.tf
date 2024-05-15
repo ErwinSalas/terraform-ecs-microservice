@@ -62,3 +62,11 @@ variable "vpc_id" {
 variable "fgms_dns_discovery_id" {
   type = string
 }
+
+variable "aws_access_key" {
+  type = string
+}
+
+variable "aws_secret_key" {
+  type = string
+}

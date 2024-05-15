@@ -15,14 +15,14 @@ module "infraestructure" {
 module "api" {
   source              = "./modules/services/api-gateway"
   replicas            = 1
-  app_image           = "erwinsalas42/go-grpc-api-gateway:c7a7debaa2113de6a98202eedf746212564123e4"
+  app_image           = "erwinsalas42/go-grpc-api-gateway:5b6a38fe3f3fa1a3a640dec098dcfacfbf1eff3f"
   container_name      = "api-app"
   app_port            = 3000
   cpu                 = var.fargate_cpu
   memory              = var.fargate_memory
   health_check_path   = "/health"
-  auth_service_url    = "dns://auth-service.${var.fargate_private_dns_namespace}"
-  order_service_url   = "dns://order-service.${var.fargate_private_dns_namespace}"
+  auth_service_url    = "cloudmap://auth-service.${var.fargate_private_dns_namespace}"
+  order_service_url   = "cloudmap://${var.fargate_private_dns_namespace}"
   ecs_cluster_id      = module.infraestructure.ecs_cluster_id
   task_execution_role = module.infraestructure.task_execution_role_arn
   auto_scale_role     = module.infraestructure.auto_scale_role_arn
@@ -33,13 +33,14 @@ module "api" {
   vpc_id              = module.infraestructure.vpc_id
   ecs_cluster_name    = module.infraestructure.ecs_cluster_name
   fgms_dns_discovery_id = module.infraestructure.fgms_dns_discovery_id
-  depends_on = [module.infraestructure]
+  aws_access_key = var.aws_access_key
+  aws_secret_key = var.aws_secret_key
 }
 
 module "auth" {
   source              = "./modules/services/auth-service"
   replicas            = 1
-  app_image           = "erwinsalas42/go-grpc-auth-svc:c3a552a0d20567e9898a6ddaf71bb8d60f0658e6"
+  app_image           = "erwinsalas42/go-grpc-auth-svc:7a3d9983eaa3f693a01210bf761afc5ac5e17dfc"
   app_port            = 50051
   cpu                 = var.fargate_cpu
   memory              = var.fargate_memory
@@ -54,7 +55,8 @@ module "auth" {
   api_sg             = module.api.api_sg
   ecs_cluster_name = module.infraestructure.ecs_cluster_name
   fgms_dns_discovery_id = module.infraestructure.fgms_dns_discovery_id
-  depends_on = [module.infraestructure, module.api]
+   aws_access_key = var.aws_access_key
+  aws_secret_key = var.aws_secret_key
 }
 
 # module "orders" {

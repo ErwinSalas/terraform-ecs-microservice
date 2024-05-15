@@ -26,7 +26,15 @@ resource "aws_ecs_task_definition" "auth" {
         , {
           name  = "API_SECRET"
           value = "98hbun98h"
-        }
+        },
+        {
+        name  = "AWS_ACCESS_KEY_ID"
+        value = var.aws_access_key
+      },
+      {
+        name  = "AWS_SECRET_ACCESS_KEY"
+        value = var.aws_secret_key
+      },
       ]
       logConfiguration = {
         logDriver = "awslogs"

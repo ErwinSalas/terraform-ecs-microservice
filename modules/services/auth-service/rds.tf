@@ -5,7 +5,7 @@ resource "aws_db_subnet_group" "auth_rds_subnet_group" {
 }
 
 resource "aws_db_instance" "auth_db" {
-  name                   = "auth"
+  db_name                   = "auth"
   allocated_storage         = 20
   engine                    = "postgres"
   instance_class            = "db.t3.micro"

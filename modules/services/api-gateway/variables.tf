@@ -73,3 +73,12 @@ variable "auth_service_url" {
 variable "order_service_url" {
   type = string
 }
+
+
+variable "aws_access_key" {
+  type = string
+}
+
+variable "aws_secret_key" {
+  type = string
+}

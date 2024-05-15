@@ -29,7 +29,15 @@ resource "aws_ecs_task_definition" "api_gateway" {
         {
           name  = "ORDER_SVC_URL"
           value = "${var.order_service_url}"
-        }
+        },
+        {
+        name  = "AWS_ACCESS_KEY_ID"
+        value = var.aws_access_key
+      },
+      {
+        name  = "AWS_SECRET_ACCESS_KEY"
+        value = var.aws_secret_key
+      },
 
       ]
       logConfiguration = {
