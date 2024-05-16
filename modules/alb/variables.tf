@@ -42,3 +42,11 @@ variable "target_groups" {
     priority          = number
   }))
 }
+
+variable "acm_arn" {
+  type = string
+} 
+
+variable "ssl_policy" {
+  type = string
+} 

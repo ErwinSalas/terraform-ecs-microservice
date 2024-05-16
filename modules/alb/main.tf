@@ -31,12 +31,13 @@ resource "aws_alb_target_group" "grpc_alb_target_group" {
   name        = "${lower(each.key)}-tg"
   port        = each.value.port
   protocol    = each.value.protocol
+  protocol_version = "GRPC"
   target_type = "ip"
   vpc_id      = var.vpc_id
 
   health_check {
+    path = each.value.health_check_path
     protocol = each.value.protocol
-    port     = each.value.port
   }
 }
 
@@ -46,6 +47,8 @@ resource "aws_alb_listener" "alb_listener" {
   load_balancer_arn = aws_alb.alb.id
   port              = each.value["listener_port"]
   protocol          = each.value["listener_protocol"]
+  certificate_arn = var.acm_arn
+  ssl_policy = var.ssl_policy
 
   default_action {
     type = "fixed-response"
@@ -60,7 +63,7 @@ resource "aws_alb_listener" "alb_listener" {
 #Creat listener rules
 resource "aws_alb_listener_rule" "grpc_alb_listener_rule" {
   for_each     = local.grpc_target_groups
-  listener_arn = aws_alb_listener.alb_listener["HTTP"].arn
+  listener_arn = aws_alb_listener.alb_listener["HTTPS"].arn
   action {
     type             = "forward"
     target_group_arn = aws_alb_target_group.grpc_alb_target_group[each.key].arn

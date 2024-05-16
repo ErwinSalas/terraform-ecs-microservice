@@ -1,12 +1,15 @@
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
+      source = "hashicorp/aws"
     }
   }
 }
 
+resource "aws_acm_certificate" "self_signed_cert" {
+  private_key      = file("./ssl/server.key")
+  certificate_body = file("./ssl/server.crt")
+}
 
 
 module "iam" {
@@ -15,14 +18,14 @@ module "iam" {
 }
 
 module "vpc" {
-  source   = "./modules/vpc"
-  app_name = var.app_name
-  env      = var.env
-  cidr     = var.cidr
-  private_subnets = var.private_subnets
-  public_subnets = var.public_subnets
+  source             = "./modules/vpc"
+  app_name           = var.app_name
+  env                = var.env
+  cidr               = var.cidr
+  private_subnets    = var.private_subnets
+  public_subnets     = var.public_subnets
   availability_zones = var.availability_zones
-  az_count = var.az_count
+  az_count           = var.az_count
 }
 
 module "security_groups" {
@@ -64,6 +67,13 @@ module "auth_database" {
   ]
 }
 
+# module "route53_private_zone" {
+#   source            = "./modules/route53"
+#   internal_url_name = var.internal_url_name
+#   alb               = module.internal_alb.internal_alb
+#   vpc_id            = module.vpc.vpc_id
+# }
+
 module "internal_alb" {
   source            = "./modules/alb"
   name              = "${lower(var.app_name)}-internal-alb"
@@ -72,7 +82,9 @@ module "internal_alb" {
   target_groups     = local.internal_alb_target_groups
   internal          = true
   listener_port     = 443
-  listener_protocol = "TCP"
+  listener_protocol = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  acm_arn           = aws_acm_certificate.self_signed_cert.arn
   listeners         = var.internal_alb_config.listeners
   security_groups   = [module.security_groups.security_group_ids[var.internal_lb_key]]
 }
@@ -86,15 +98,10 @@ module "public_alb" {
   internal          = false
   listener_port     = 80
   listener_protocol = "HTTP"
+  ssl_policy        = null
+  acm_arn           = null
   listeners         = var.public_alb_config.listeners
   security_groups   = [module.security_groups.security_group_ids[var.external_lb_key]]
-}
-
-module "route53_private_zone" {
-  source            = "./modules/route53"
-  internal_url_name = var.internal_url_name
-  alb               = module.internal_alb.internal_alb
-  vpc_id            = module.vpc.vpc_id
 }
 
 
@@ -124,7 +131,7 @@ module "ecs" {
       },
       {
         name  = "AUTH_SVC_URL"
-        value = "${module.internal_alb.alb-dns}"
+        value = "${module.internal_alb.alb-dns}:443"
       },
       {
         name  = "PRODUCT_SVC_URL"
@@ -133,7 +140,19 @@ module "ecs" {
       {
         name  = "ORDER_SVC_URL"
         value = ""
-      }
+      },
+      {
+        name  = "AWS_ACCESS_KEY_ID"
+        value = local.aws_keys.aws_access_key
+      },
+      {
+        name  = "AWS_SECRET_ACCESS_KEY"
+        value = local.aws_keys.aws_secret_key
+      },
+      {
+        name  = "ARN"
+        value = aws_acm_certificate.self_signed_cert.arn
+      },
     ]
     "${var.auth_service_key}" = [
       {
@@ -147,7 +166,19 @@ module "ecs" {
       , {
         name  = "API_SECRET"
         value = "98hbun98h"
-      }
+      },
+      {
+        name  = "AWS_ACCESS_KEY_ID"
+        value = local.aws_keys.aws_access_key
+      },
+      {
+        name  = "AWS_SECRET_ACCESS_KEY"
+        value = local.aws_keys.aws_secret_key
+      },
+      {
+        name  = "ARN"
+        value = aws_acm_certificate.self_signed_cert.arn
+      },
     ]
 
   }
