@@ -2,6 +2,10 @@ variable "app_name" {
   type = string
 }
 
+variable "namespace" {
+  type = string
+}
+
 variable "app_services" {
   type = list(string)
 }
@@ -23,10 +27,6 @@ variable "vpc_id" {
 }
 
 variable "private_subnets" {
-  type = list(string)
-}
-
-variable "public_subnets" {
   type = list(string)
 }
 
@@ -70,12 +70,6 @@ variable "service_config" {
         target_value = number
       })
     })
-  }))
-}
-
-variable "internal_alb_target_groups" {
-  type = map(object({
-    arn = string
   }))
 }
 

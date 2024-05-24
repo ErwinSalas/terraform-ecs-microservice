@@ -4,7 +4,7 @@ account      = 000000
 region       = "us-east-1"
 app_name     = "ecs-demo"
 env          = "dev"
-app_services = ["api-gateway-key", "auth-service-key"]
+app_services = ["api-gateway", "auth"]
 
 #VPC configurations
 cidr               = "10.0.0.0/16"
@@ -16,22 +16,15 @@ az_count           = 2
 ########################################################################################################################
 # Map Keys
 
-auth_service_key = "auth-service-key"
-auth_db_key      = "auth-db-key"
-api_gateway_key  = "api-gateway-key"
-internal_lb_key  = "internal-lb-key"
-external_lb_key  = "external-lb-key"
+auth_service_key    = "auth"
+auth_db_key         = "auth-db"
+order_service_key   = "orders"
+order_db_key        = "orders-db"
+product_service_key = "products"
+product_db_key      = "products-db"
+api_gateway_key     = "api-gateway"
+external_lb_key     = "external-lb"
 
-#Internal ALB configurations
-internal_alb_config = {
-  name = "Internal-Alb"
-  listeners = {
-    "HTTPS" = {
-      listener_port     = 443
-      listener_protocol = "HTTPS"
-    }
-  }
-}
 
 #Friendly url name for internal load balancer DNS
 internal_url_name = "ecs-fargate.com"

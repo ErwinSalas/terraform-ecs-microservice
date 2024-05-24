@@ -1,13 +1,10 @@
 ########################################################################################################################
 # Application
-variable "aws_access_key" {
-  type = string
-}
 
-variable "aws_secret_key" {
-  type = string
-}
 
+variable "namespace" {
+  default = "ecs.local"
+}
 variable "account" {
   type        = number
   description = "AWS account number"
@@ -45,11 +42,23 @@ variable "auth_db_key" {
   type = string
 }
 
-variable "api_gateway_key" {
+variable "order_service_key" {
   type = string
 }
 
-variable "internal_lb_key" {
+variable "order_db_key" {
+  type = string
+}
+
+variable "product_service_key" {
+  type = string
+}
+
+variable "product_db_key" {
+  type = string
+}
+
+variable "api_gateway_key" {
   type = string
 }
 
@@ -88,17 +97,6 @@ variable "az_count" {
 
 ########################################################################################################################
 #ALB
-
-variable "internal_alb_config" {
-  type = object({
-    name = string
-    listeners = map(object({
-      listener_port     = number
-      listener_protocol = string
-    }))
-  })
-  description = "Internal ALB configuration"
-}
 
 variable "internal_url_name" {
   type        = string

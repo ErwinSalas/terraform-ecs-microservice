@@ -10,9 +10,9 @@
 #  value = module.vpc.public-subnets
 #}
 
-output "internal-alb-dns" {
-  value = module.internal_alb.alb-dns
-}
+# output "internal-alb-dns" {
+#   value = module.internal_alb.alb-dns
+# }
 
 output "external-alb-dns" {
   value = module.public_alb.alb-dns
