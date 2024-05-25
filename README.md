@@ -11,7 +11,9 @@ Explore the power of cloud-native architectures with a practical dive into build
 - https://github.com/ErwinSalas/go-grpc-api-gateway - API Gateway (HTTP)
 - https://github.com/ErwinSalas/terraform-ecs-microservice- Terraform scripts bootstrap all the microservices
 
-
+## Services
+![services diagram](docs/img/microservice_architecture.webp)
+ 
 
 ## Installation
 ### Terraform
@@ -54,15 +56,20 @@ $ terraform plan
 $ terraform apply
 ```
 
+
+
+
+
 ## Authors
 
 - [Kevin Vogel](https://medium.com/@hellokevinvogel)
     * Main microservice design
     * Blog Post [Microservices with Go, gRPC, API Gateway, and Authentication | by Kevin Vogel](https://levelup.gitconnected.com/microservices-with-go-grpc-api-gateway-and-authentication-part-1-2-393ad9fc9d30)
 - [Erwin Salas](https://github.com/ErwinSalas)
-    * Code Refactor
-    * Containerization
-    * Kubernetes
+    * Code Refactor (Health Checks, Clean Architecture, Scaffold redesign, logging)
+    * Github Actions in all the microservices
+    * Containerization Docker hub repo
+    * AWS Cloud Solution
     * Terraform scripts
 
 
