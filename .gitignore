@@ -6,4 +6,7 @@
 
 # Module directory
 .terraform/
-*.tfvars
+aws_keys.json
+credentials.json
+ssl/server.crt
+ssl/server.key

@@ -1,93 +1,130 @@
-module "infraestructure" {
-  source                       = "./modules/infraestructure"
-  fargate_cpu                  = var.fargate_cpu
-  fargate_memory               = var.fargate_memory
-  health_check_path            = "/health"
-  ecs_auto_scale_role_name     = var.ecs_auto_scale_role_name
-  ec2_task_execution_role_name = var.ec2_task_execution_role_name
-  aws_region                   = var.aws_region
-  az_count                     = var.az_count
-  target_app_port              = 3000
-  fargate_private_dns_namespace = var.fargate_private_dns_namespace
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
 }
 
-
-module "api" {
-  source              = "./modules/services/api-gateway"
-  replicas            = 1
-  app_image           = "erwinsalas42/go-grpc-api-gateway:5b6a38fe3f3fa1a3a640dec098dcfacfbf1eff3f"
-  container_name      = "api-app"
-  app_port            = 3000
-  cpu                 = var.fargate_cpu
-  memory              = var.fargate_memory
-  health_check_path   = "/health"
-  auth_service_url    = "cloudmap://auth-service.${var.fargate_private_dns_namespace}"
-  order_service_url   = "cloudmap://${var.fargate_private_dns_namespace}"
-  ecs_cluster_id      = module.infraestructure.ecs_cluster_id
-  task_execution_role = module.infraestructure.task_execution_role_arn
-  auto_scale_role     = module.infraestructure.auto_scale_role_arn
-  aws_region          = var.aws_region
-  private_subnets     = module.infraestructure.private_subnets
-  target_group_arn    = module.infraestructure.target_group_arn
-  alb_sg              = module.infraestructure.alb_sg_id
-  vpc_id              = module.infraestructure.vpc_id
-  ecs_cluster_name    = module.infraestructure.ecs_cluster_name
-  fgms_dns_discovery_id = module.infraestructure.fgms_dns_discovery_id
-  aws_access_key = var.aws_access_key
-  aws_secret_key = var.aws_secret_key
-}
-
-module "auth" {
-  source              = "./modules/services/auth-service"
-  replicas            = 1
-  app_image           = "erwinsalas42/go-grpc-auth-svc:7a3d9983eaa3f693a01210bf761afc5ac5e17dfc"
-  app_port            = 50051
-  cpu                 = var.fargate_cpu
-  memory              = var.fargate_memory
-  container_name      = "auth-app"
-  health_check_path   = "/health"
-  ecs_cluster_id      = module.infraestructure.ecs_cluster_id
-  task_execution_role = module.infraestructure.task_execution_role_arn
-  auto_scale_role     = module.infraestructure.auto_scale_role_arn
-  aws_region          = var.aws_region
-  private_subnets     = module.infraestructure.private_subnets
-  vpc_id              = module.infraestructure.vpc_id
-  api_sg             = module.api.api_sg
-  ecs_cluster_name = module.infraestructure.ecs_cluster_name
-  fgms_dns_discovery_id = module.infraestructure.fgms_dns_discovery_id
-   aws_access_key = var.aws_access_key
-  aws_secret_key = var.aws_secret_key
-}
-
-# module "orders" {
-#   source              = "./modules/services/order-service"
-#   replicas            = 1
-#   app_image           = "erwinsalas42/go-grpc-order-svc:c5beac14be26667a1e5f7bd6e3fdb0db047444b0"
-#   app_port            = 50053
-#   cpu                 = var.fargate_cpu
-#   memory              = var.fargate_memory
-#   health_check_path   = "/"
-#   container_name      = "order-app"
-#   subnet_ids          = module.infraestructure.private_subnets
-#   ecs_cluster_id      = module.infraestructure.ecs_cluster_id
-#   task_execution_role = module.infraestructure.task_execution_role_arn
-#   auto_scale_role     = module.infraestructure.auto_scale_role_arn
-#   aws_region          = var.aws_region
-#   private_subnets     = module.infraestructure.private_subnets
-#   target_group_arn    = module.infraestructure.order_target_group_arn
-#   vpc_id              = module.infraestructure.vpc_id
-#   ecs_cluster_name    = module.infraestructure.ecs_cluster_name
-#   api_sg             = module.api.api_sg
-#   fgms_dns_discovery_id = module.infraestructure.fgms_dns_discovery_id
-#   depends_on = [module.infraestructure]
+# resource "aws_acm_certificate" "self_signed_cert" {
+#   private_key      = file("./ssl/server.key")
+#   certificate_body = file("./ssl/server.crt")
 # }
 
-# module "products" {
-#   source     = "./modules/services/product-service"
-#   replicas   = 3
-#   app_image = "erwinsalas42/go-grpc-product-svc:befa435a3cfd70dda6f108905a008932eaa63990"
-#   app_port = 50054
-#   fargate_cpu = 1024
-#   fargate_memory = 2048
-#   health_check_path = "/"
-# }
+
+module "iam" {
+  source   = "./modules/iam"
+  app_name = var.app_name
+}
+
+module "vpc" {
+  source             = "./modules/vpc"
+  app_name           = var.app_name
+  env                = var.env
+  cidr               = var.cidr
+  private_subnets    = var.private_subnets
+  public_subnets     = var.public_subnets
+  availability_zones = var.availability_zones
+  az_count           = var.az_count
+}
+
+module "security_groups" {
+  source        = "./modules/sg"
+  vpc_id        = module.vpc.vpc_id
+  ingress_rules = local.ingress_rules
+}
+
+
+module "databases" {
+  source          = "./modules/rds"
+  private_subnets = module.vpc.private_subnets
+  db_config = local.db_config
+  security_groups_ids = module.security_groups.security_group_ids
+}
+
+module "public_alb" {
+  source            = "./modules/alb"
+  name              = "${lower(var.app_name)}-public-alb"
+  subnets           = module.vpc.public_subnets
+  vpc_id            = module.vpc.vpc_id
+  target_groups     = local.public_alb_target_groups
+  internal          = false
+  listener_port     = 80
+  listener_protocol = "HTTP"
+  ssl_policy        = null
+  acm_arn           = null
+  listeners         = var.public_alb_config.listeners
+  security_groups   = module.security_groups.security_group_ids[var.external_lb_key]
+}
+
+
+module "ecs" {
+  source                      = "./modules/ecs"
+  app_name                    = var.app_name
+  app_services                = var.app_services
+  account                     = var.account
+  region                      = var.region
+  namespace                   = var.namespace
+  service_config              = local.microservice_config
+  ecs_task_execution_role_arn = module.iam.ecs_task_execution_role_arn
+  vpc_id                      = module.vpc.vpc_id
+  private_subnets             = module.vpc.private_subnets
+  public_alb_target_groups    = module.public_alb.target_groups
+  security_groups = {
+    "${var.api_gateway_key}"  = module.security_groups.security_group_ids[var.api_gateway_key],
+    "${var.auth_service_key}" = module.security_groups.security_group_ids[var.auth_service_key],
+    "${var.order_service_key}" = module.security_groups.security_group_ids[var.order_service_key],
+    "${var.product_service_key}" = module.security_groups.security_group_ids[var.product_service_key],
+  }
+
+  envs = {
+    "${var.api_gateway_key}" = [
+      {
+        name  = "PORT"
+        value = ":3000"
+      },
+      {
+        name  = "AUTH_SVC_URL"
+        value = "auth-service.ecs.local:50051"
+      },
+      {
+        name  = "PRODUCT_SVC_URL"
+        value = "products-service.ecs.local:50052"
+      },
+      {
+        name  = "ORDER_SVC_URL"
+        value = "orders-service.ecs.local:50053"
+      },
+    ]
+    "${var.auth_service_key}" = [
+      {
+        name  = "DB_URL"
+        value = module.databases.db_urls["${var.auth_service_key}"]
+      }
+      , {
+        name  = "JWT_SECRET_KEY"
+        value = "r43t18sc"
+      }
+      , {
+        name  = "API_SECRET"
+        value = "98hbun98h"
+      },
+    ]
+    "${var.order_service_key}" = [
+      {
+        name  = "DB_URL"
+        value = module.databases.db_urls["${var.order_service_key}"]
+      },
+      {
+        name  = "PRODUCT_SVC_URL"
+        value = "products-service.ecs.local:50052"
+      },
+    ]
+     "${var.product_service_key}" = [
+      {
+        name  = "DB_URL"
+        value = module.databases.db_urls["${var.product_service_key}"]
+      },
+     ]
+  }
+}
