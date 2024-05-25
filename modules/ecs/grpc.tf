@@ -1,4 +1,7 @@
 
+# ECS Task Definitions for gRPC microservices
+# These tasks include grpcurl in their images to facilitate container health checks 
+# by calling the grpc.health.v1.Health/Check endpoint.
 resource "aws_ecs_task_definition" "grpc_ecs_task_definition" {
   for_each                 = local.grpc_service_config
   family                   = "${lower(var.app_name)}-${each.key}"
@@ -23,7 +26,7 @@ resource "aws_ecs_task_definition" "grpc_ecs_task_definition" {
           hostPort : each.value.host_port
         }
       ]
-      healthCheck = each.value.is_public == false ? {
+      healthCheck = {
       command     = [
         "grpcurl",
         "-plaintext",
@@ -36,7 +39,7 @@ resource "aws_ecs_task_definition" "grpc_ecs_task_definition" {
       timeout     = 5
       retries     = 3
       startPeriod = 60
-    } : null
+    }
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -51,7 +54,9 @@ resource "aws_ecs_task_definition" "grpc_ecs_task_definition" {
 }
 
 
-#Create services for app services
+# ECS Services for gRPC microservices
+# These services use AWS Service Connect for simplified inter-service communication 
+# and do not require load balancer association.
 resource "aws_ecs_service" "grpc_service" {
   for_each = local.grpc_service_config
 
@@ -66,6 +71,7 @@ resource "aws_ecs_service" "grpc_service" {
     security_groups  = [var.security_groups[each.key]]
   }
 
+  # AWS Service Connect configuration for inter-service communication
   service_connect_configuration {
     enabled = true
     namespace =  aws_service_discovery_private_dns_namespace.sevice_discovery_namespace.arn

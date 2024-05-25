@@ -50,27 +50,48 @@ locals {
         }
       }
     },
-    # "${var.order_service_key}" = {
-    #   name             = "${var.order_service_key}"
-    #   is_public        = false
-    #   image            = "erwinsalas42/go-grpc-order-svc:a2231b7cb71a9820d419d31ce472d33bb8c677f8"
-    #   container_port   = 50053
-    #   host_port        = 50053
-    #   cpu              = 256
-    #   memory           = 512
-    #   desired_count    = 1
-    #   alb_target_group = null
-    #   auto_scaling = {
-    #     max_capacity = 2
-    #     min_capacity = 1
-    #     cpu = {
-    #       target_value = 75
-    #     }
-    #     memory = {
-    #       target_value = 75
-    #     }
-    #   }
-    # },
+    "${var.order_service_key}" = {
+      name             = "${var.order_service_key}"
+      is_public        = false
+      image            = "erwinsalas42/go-grpc-order-svc:0eab8641d2b599b6374095371bc29397abbf0110"
+      container_port   = 50053
+      host_port        = 50053
+      cpu              = 256
+      memory           = 512
+      desired_count    = 1
+      alb_target_group = null
+      auto_scaling = {
+        max_capacity = 2
+        min_capacity = 1
+        cpu = {
+          target_value = 75
+        }
+        memory = {
+          target_value = 75
+        }
+      }
+    },
+     "${var.product_service_key}" = {
+      name             = "${var.product_service_key}"
+      is_public        = false
+      image            = "erwinsalas42/go-grpc-product-svc:834ffa4e54cf388e9c3971c4922aa1b8ddccec22"
+      container_port   = 50052
+      host_port        = 50052
+      cpu              = 256
+      memory           = 512
+      desired_count    = 1
+      alb_target_group = null
+      auto_scaling = {
+        max_capacity = 2
+        min_capacity = 1
+        cpu = {
+          target_value = 75
+        }
+        memory = {
+          target_value = 75
+        }
+      }
+    },
   }
 
   db_config = {
@@ -107,41 +128,41 @@ locals {
       cidr_blocks = [var.cidr]
       source_sg   = var.auth_service_key
     },
-    # { name        = "${var.order_service_key}"
-    #   from_port   = local.microservice_config[var.order_service_key].host_port
-    #   to_port     = local.microservice_config[var.order_service_key].host_port
-    #   protocol    = "tcp"
-    #   cidr_blocks = [var.cidr]
-    #   source_sg   = var.api_gateway_key
-    # },
-    # { name        = "${var.order_db_key}"
-    #   from_port   = 5432
-    #   to_port     = 5432
-    #   protocol    = "tcp"
-    #   cidr_blocks = [var.cidr]
-    #   source_sg   = var.order_service_key
-    # },
-    # { name        = "${var.product_service_key}"
-    #   from_port   = local.microservice_config[var.product_service_key].host_port
-    #   to_port     = local.microservice_config[var.product_service_key].host_port
-    #   protocol    = "tcp"
-    #   cidr_blocks = [var.cidr]
-    #   source_sg   = var.api_gateway_key
-    # },
-    # { name        = "${var.product_service_key}"
-    #   from_port   = local.microservice_config[var.product_service_key].host_port
-    #   to_port     = local.microservice_config[var.product_service_key].host_port
-    #   protocol    = "tcp"
-    #   cidr_blocks = [var.cidr]
-    #   source_sg   = var.order_service_key
-    # },
-    # { name        = "${var.product_db_key}"
-    #   from_port   = 5432
-    #   to_port     = 5432
-    #   protocol    = "tcp"
-    #   cidr_blocks = [var.cidr]
-    #   source_sg   = var.product_service_key
-    # },
+    { name        = "${var.order_service_key}"
+      from_port   = local.microservice_config[var.order_service_key].host_port
+      to_port     = local.microservice_config[var.order_service_key].host_port
+      protocol    = "tcp"
+      cidr_blocks = [var.cidr]
+      source_sg   = var.api_gateway_key
+    },
+    { name        = "${var.order_db_key}"
+      from_port   = 5432
+      to_port     = 5432
+      protocol    = "tcp"
+      cidr_blocks = [var.cidr]
+      source_sg   = var.order_service_key
+    },
+    { name        = "${var.product_service_key}"
+      from_port   = local.microservice_config[var.product_service_key].host_port
+      to_port     = local.microservice_config[var.product_service_key].host_port
+      protocol    = "tcp"
+      cidr_blocks = [var.cidr]
+      source_sg   = var.api_gateway_key
+    },
+    { name        = "${var.product_service_key}"
+      from_port   = local.microservice_config[var.product_service_key].host_port
+      to_port     = local.microservice_config[var.product_service_key].host_port
+      protocol    = "tcp"
+      cidr_blocks = [var.cidr]
+      source_sg   = var.order_service_key
+    },
+    { name        = "${var.product_db_key}"
+      from_port   = 5432
+      to_port     = 5432
+      protocol    = "tcp"
+      cidr_blocks = [var.cidr]
+      source_sg   = var.product_service_key
+    },
     { name        = "${var.api_gateway_key}"
       from_port   = local.microservice_config[var.api_gateway_key].host_port
       to_port     = local.microservice_config[var.api_gateway_key].host_port

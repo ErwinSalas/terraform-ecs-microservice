@@ -10,7 +10,6 @@ resource "aws_vpc" "vpc" {
 }
 
 # Public subnets #######################################
-
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.vpc.id
   count                   = length(var.public_subnets)
@@ -24,19 +23,19 @@ resource "aws_subnet" "public_subnet" {
   }
 }
 
-
+# The Internet Gateway allows inbound and outbound traffic between the public internet and the VPC.
 resource "aws_internet_gateway" "internet_gw" {
   vpc_id = aws_vpc.vpc.id
 }
 
-# Route the public subnet traffic through the IGW
+# Route the public subnet traffic through the Internet Gateway
 resource "aws_route" "internet_access" {
   route_table_id         = aws_vpc.vpc.main_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.internet_gw.id
 }
 
-# Private subnets ###################################################
+# Private subnets 
 resource "aws_subnet" "private_subnet" {
   vpc_id            = aws_vpc.vpc.id
   count             = length(var.private_subnets)
@@ -57,19 +56,23 @@ resource "aws_route_table" "private_route_table" {
   }
 }
 
-# Create a NAT gateway with an Elastic IP for each private subnet to get internet connectivity
+# Create an Elastic IP for each NAT gateway. 
 resource "aws_eip" "nat_eip" {
     count      = length(var.public_subnets)
     depends_on = [aws_internet_gateway.internet_gw]
 }
 
+# The NAT gateway enables instances in the private subnets to access the internet 
+# for updates and patches while blocking inbound traffic from the internet.
+# In this specific solution, ECS requires the NAT gateway to pull Docker images from Docker Hub.
 resource "aws_nat_gateway" "nat_gw" {
     count         = length(var.public_subnets)
     subnet_id     = element(aws_subnet.public_subnet.*.id, count.index)
     allocation_id = element(aws_eip.nat_eip.*.id, count.index)
 }
 
-# Create a new route table for the private subnets, make it route non-local traffic through the NAT gateway to the internet
+# Create a new route table for the private subnets and configure it to route 
+# non-local traffic through the NAT gateway to the internet.
 resource "aws_route_table" "private" {
     count  = length(var.availability_zones)
     vpc_id = aws_vpc.vpc.id
@@ -80,7 +83,8 @@ resource "aws_route_table" "private" {
     }
 }
 
-# Explicitly associate the newly created route tables to the private subnets (so they don't default to the main route table)
+# Explicitly associate the newly created route tables with the private subnets 
+# to ensure they do not default to the main route table.
 resource "aws_route_table_association" "private" {
     count  = length(var.availability_zones)
     subnet_id      = element(aws_subnet.private_subnet.*.id, count.index)

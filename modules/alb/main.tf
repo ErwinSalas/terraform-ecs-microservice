@@ -7,7 +7,6 @@ resource "aws_alb" "alb" {
   security_groups    = [var.security_groups]
 }
 
-#Dynamically create the alb target groups for app services
 resource "aws_alb_target_group" "http_alb_target_group" {
   for_each    =  var.target_groups
   name        = "${lower(each.key)}-tg"

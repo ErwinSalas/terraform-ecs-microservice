@@ -1,15 +1,18 @@
 
 locals {
-    sg_groups = {for rule in var.ingress_rules : rule.name => rule.name }
+  # var.ingress_rules is a list of objects. Some rules may have the same name as they belong to the same security group. 
+  # To compute the list of security groups required for the solution, distinct_rule_names generates an array with unique
+  # security group names by eliminating duplicates.
+  distinct_rule_names = distinct([for rule in var.ingress_rules : rule.name])
+  sg_groups = { for name in local.distinct_rule_names : name => name }
 }
+
 resource "aws_security_group" "security_group" {
   for_each = local.sg_groups
   name        = each.value
   vpc_id      = var.vpc_id
   description = "security group for ${each.value}"
 }
-
-
 
 resource "aws_security_group_rule" "ingress_rule" {
   for_each = { for idx, rule in var.ingress_rules : idx => rule }
@@ -27,9 +30,9 @@ resource "aws_security_group_rule" "egress_rule" {
   for_each = local.sg_groups
 
   type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  from_port   = 0
+  to_port     = 0
+  protocol    = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
   security_group_id = aws_security_group.security_group[each.key].id
 }

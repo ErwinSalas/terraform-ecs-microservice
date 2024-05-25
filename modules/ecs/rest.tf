@@ -1,4 +1,8 @@
 
+# ECS Task Definitions for REST Microservices
+# These tasks perform health checks using HTTP endpoints. 
+# The health checks are configured to call specific paths set up for this purpose 
+# through the load balancer target group.
 resource "aws_ecs_task_definition" "rest_ecs_task_definition" {
   for_each                 = local.rest_service_config
   family                   = "${lower(var.app_name)}-${each.key}"
@@ -52,24 +56,29 @@ resource "aws_ecs_service" "rest_service" {
     security_groups  = [var.security_groups[each.key]]
   }
 
+    # In this cloud solution, the REST microservices utilize a public Application Load Balancer (ALB) 
+    # to receive and route traffic.
     load_balancer {
       target_group_arn = var.public_alb_target_groups[each.key].arn
       container_name   = each.value.name
       container_port   = each.value.container_port
     }
 
-  service_connect_configuration {
-    enabled = true
-    namespace =  aws_service_discovery_private_dns_namespace.sevice_discovery_namespace.arn
-    service {
-        client_alias {
-          dns_name = "${each.value.name}-service.${var.namespace}"
-          port = "${each.value.container_port}"
+    # Even though we use an ALB in front of this service, it needs to be registered 
+    # in the same namespace as the gRPC service within the service mesh via Service Connect.
+    # This is to enable service-to-service communication between gRPC and REST services.
+    service_connect_configuration {
+        enabled = true
+        namespace =  aws_service_discovery_private_dns_namespace.sevice_discovery_namespace.arn
+        service {
+            client_alias {
+            dns_name = "${each.value.name}-service.${var.namespace}"
+            port = "${each.value.container_port}"
+            }
+        port_name       = each.key
+        discovery_name  =  "${each.value.name}-service"
         }
-      port_name       = each.key
-      discovery_name  =  "${each.value.name}-service"
     }
-  }
 }
 
 

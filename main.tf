@@ -73,7 +73,8 @@ module "ecs" {
   security_groups = {
     "${var.api_gateway_key}"  = module.security_groups.security_group_ids[var.api_gateway_key],
     "${var.auth_service_key}" = module.security_groups.security_group_ids[var.auth_service_key],
-    # "${var.order_service_key}" = module.security_groups.security_group_ids[var.order_service_key],
+    "${var.order_service_key}" = module.security_groups.security_group_ids[var.order_service_key],
+    "${var.product_service_key}" = module.security_groups.security_group_ids[var.product_service_key],
   }
 
   envs = {
@@ -88,7 +89,7 @@ module "ecs" {
       },
       {
         name  = "PRODUCT_SVC_URL"
-        value = ""
+        value = "products-service.ecs.local:50052"
       },
       {
         name  = "ORDER_SVC_URL"
@@ -109,15 +110,21 @@ module "ecs" {
         value = "98hbun98h"
       },
     ]
-    # "${var.order_service_key}" = [
-    #   {
-    #     name  = "DB_URL"
-    #     value = module.databases.db_urls["${var.order_service_key}"]
-    #   },
-    #   {
-    #     name  = "PRODUCT_SVC_URL"
-    #     value = ""
-    #   },
-    # ]
+    "${var.order_service_key}" = [
+      {
+        name  = "DB_URL"
+        value = module.databases.db_urls["${var.order_service_key}"]
+      },
+      {
+        name  = "PRODUCT_SVC_URL"
+        value = "products-service.ecs.local:50052"
+      },
+    ]
+     "${var.product_service_key}" = [
+      {
+        name  = "DB_URL"
+        value = module.databases.db_urls["${var.product_service_key}"]
+      },
+     ]
   }
 }
