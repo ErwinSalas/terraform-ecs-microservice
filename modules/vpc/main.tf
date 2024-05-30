@@ -48,14 +48,6 @@ resource "aws_subnet" "private_subnet" {
   }
 }
 
-resource "aws_route_table" "private_route_table" {
-  vpc_id = aws_vpc.vpc.id
-  tags   = {
-    Name = "${lower(var.app_name)}private-route-table"
-    Env  = var.env
-  }
-}
-
 # Create an Elastic IP for each NAT gateway. 
 resource "aws_eip" "nat_eip" {
     count      = length(var.public_subnets)

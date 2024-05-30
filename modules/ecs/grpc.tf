@@ -63,12 +63,16 @@ resource "aws_ecs_service" "grpc_service" {
   name            = "${each.value.name}-service"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.grpc_ecs_task_definition[each.key].arn
-  launch_type     = "FARGATE"
   desired_count   = each.value.desired_count
 
   network_configuration {
     subnets          = var.private_subnets
     security_groups  = [var.security_groups[each.key]]
+  }
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
   }
 
   # AWS Service Connect configuration for inter-service communication

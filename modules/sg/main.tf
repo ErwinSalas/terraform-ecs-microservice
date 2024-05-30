@@ -8,11 +8,11 @@ locals {
 }
 
 resource "aws_security_group" "security_group" {
-  count       = length(local.sg_groups)
+  for_each = { for name in local.sg_groups : name => name }
 
-  name        = local.sg_groups[count.index]
+  name        = each.key
   vpc_id      = var.vpc_id
-  description = "security group for ${local.sg_groups[count.index]}"
+  description = "security group for ${each.key}"
 }
 
 resource "aws_security_group_rule" "ingress_rule" {
@@ -31,7 +31,7 @@ resource "aws_security_group_rule" "ingress_rule" {
 }
 
 resource "aws_security_group_rule" "egress_rule" {
-  count       = length(local.sg_groups)
+  for_each = aws_security_group.security_group
 
   type              = "egress"
   from_port   = 0
@@ -39,5 +39,5 @@ resource "aws_security_group_rule" "egress_rule" {
   # -1 means we allow all the protocols
   protocol    = "-1"
   cidr_blocks = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.security_group[each.key].id
+  security_group_id = each.value.id
 }

@@ -48,7 +48,6 @@ resource "aws_ecs_service" "rest_service" {
   name            = "${each.value.name}-service"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.rest_ecs_task_definition[each.key].arn
-  launch_type     = "FARGATE"
   desired_count   = each.value.desired_count
 
   network_configuration {
@@ -62,6 +61,11 @@ resource "aws_ecs_service" "rest_service" {
       target_group_arn = var.public_alb_target_groups[each.key].arn
       container_name   = each.value.name
       container_port   = each.value.container_port
+    }
+
+    capacity_provider_strategy {
+      capacity_provider = "FARGATE_SPOT"
+      weight            = 1
     }
 
     # Even though we use an ALB in front of this service, it needs to be registered 

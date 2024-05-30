@@ -6,12 +6,6 @@ terraform {
   }
 }
 
-# resource "aws_acm_certificate" "self_signed_cert" {
-#   private_key      = file("./ssl/server.key")
-#   certificate_body = file("./ssl/server.crt")
-# }
-
-
 module "iam" {
   source   = "./modules/iam"
   app_name = var.app_name
