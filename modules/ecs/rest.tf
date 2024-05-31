@@ -49,6 +49,7 @@ resource "aws_ecs_service" "rest_service" {
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.rest_ecs_task_definition[each.key].arn
   desired_count   = each.value.desired_count
+  launch_type = "FARGATE"
 
   network_configuration {
     subnets          = var.private_subnets
@@ -63,10 +64,10 @@ resource "aws_ecs_service" "rest_service" {
       container_port   = each.value.container_port
     }
 
-    capacity_provider_strategy {
-      capacity_provider = "FARGATE_SPOT"
-      weight            = 1
-    }
+    # capacity_provider_strategy {
+    #   capacity_provider = "FARGATE_SPOT"
+    #   weight            = 1
+    # }
 
     # Even though we use an ALB in front of this service, it needs to be registered 
     # in the same namespace as the gRPC service within the service mesh via Service Connect.
